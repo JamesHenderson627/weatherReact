@@ -1,0 +1,151 @@
+
+@import "../bower_components/normalize-css/normalize.css";
+@import "../bower_components/typeplate-starter-kit/css/typeplate.css";
+
+/**
+ * BOX-SIZING
+ */
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+    transition-delay: 0s;
+    transition-duration: 0.25s;
+    transition-property: opacity, transform, color, background-color, border-color, z-index, background-image;
+    transition-timing-function: ease;
+}
+
+/**
+ * GRIDS
+ */
+
+.grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-wrap: wrap;
+    > * {
+        flex: 1;
+        flex-basis: 100%;
+    }
+}
+
+@define-mixin grid_r $col, $width {
+    @media only screen and (min-width: $(width)px) {
+        .grid-$(col)-$(width) {
+            & > * {
+                flex-basis: calc(100 / $col)%;
+            }
+            @mixin-content;
+        }
+    }
+}
+
+@define-mixin grid $col {
+    .grid-$(col) {
+        & > * {
+            flex-basis: calc(100 / $col)%;
+        }
+        @mixin-content;
+    }
+}
+
+@mixin grid 2 {}
+@mixin grid 4 {}
+@mixin grid 6 {}
+
+@mixin grid_r 2, 400 {}
+@mixin grid_r 2, 800 {}
+
+@mixin grid_r 4, 400 {}
+@mixin grid_r 4, 800 {}
+
+/**
+ * GENERAL
+ */
+
+img {
+    max-width: 100%;
+}
+/**
+ * YOUR CODE HERE
+ */
+
+#container {
+    position: relative;
+    height: 600px;
+    margin: 0 auto;
+
+    #weatherWrap {
+        height: 500px;
+        width: 800px;
+        border: 2px solid black;
+        border-radius: 10px;
+        margin: 0 auto;
+        background-color: #5C85FF;
+
+        #opener {
+            text-align: center;
+        }
+
+        #opener h1 {
+            font-family: 'Stardos Stencil', cursive;
+            color: #FFFFF9;
+            text-shadow: 10px 10px 20px #000000;
+        }
+
+        button {
+            background-color: #5C85FF;
+            color: #FFFFF9;
+            margin-top: 10px;
+        }
+    }
+        
+    #weatherInfo {
+        border-top: 1px solid white;
+        height: 350px;
+        width: 800px;
+        position: relative;
+        margin-top: 1rem;
+
+        h3 {
+            text-align: center; 
+            padding-top: 10px;
+            font-family: 'Stardos Stencil', cursive;
+            color: #FFFFF9;
+            text-shadow: 10px 10px 20px #000000;
+        }
+
+        #weatherIcons{
+            position: absolute;
+            width: 450px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-70%);
+
+            i {
+                font-size: 75px;
+                color: white;
+                padding: .5rem;
+            }
+        }
+    }
+}
+/* ===========CURRENT VIEW========  */
+#currentTemp {
+    text-align: center;
+    margin-top: 50px;
+    font-weight: bold;
+    color: white;
+}
+/* ===========HOURLY VIEW============= */
+#hourlyTemp, #weeklyTemp {
+    display: inline-block;
+    margin-left: 4rem;
+    color: white;
+    text-align: center;
+} 
+
+
