@@ -95,12 +95,6 @@ img {
             color: #FFFFF9;
             text-shadow: 10px 10px 20px #000000;
         }
-
-        button {
-            background-color: #5C85FF;
-            color: #FFFFF9;
-            margin-top: 10px;
-        }
     }
         
     #weatherInfo {
@@ -132,6 +126,12 @@ img {
             }
         }
     }
+}
+
+button {
+    background-color: #5C85FF;
+    color: #FFFFF9;
+    margin-top: 10px;
 }
 /* ===========CURRENT VIEW========  */
 #currentTemp {
