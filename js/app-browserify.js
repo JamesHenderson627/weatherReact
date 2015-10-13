@@ -204,7 +204,7 @@ var WeeklyInfo = React.createClass({
 		var time = this._getDay(),
 			tempMax = this._getTemp(this.props.weekly.temperatureMax),
 			tempMin =this._getTemp(this.props.weekly.temperatureMin),
-			humidity = this.props.weekly.humidity * 100
+			humidity = Math.floor(this.props.weekly.humidity * 100)
 		return(
 				<div id="weeklyTemp">
 					<p>{time}</p>
