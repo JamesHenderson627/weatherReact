@@ -26,7 +26,7 @@ console.log('loaded javascript')
 
 //===================Collection===================
 
-var DefaultWeatherCollection = Backbone.Collection.extend({
+var DefaultWeatherModel = Backbone.Model.extend({
 	url: "https://api.forecast.io/forecast/a8a1d6dd27dd4b8c77724d9b4743bcd2/29.7604,-95.3698",
 	
 	parse: function(responseData) {
@@ -35,9 +35,9 @@ var DefaultWeatherCollection = Backbone.Collection.extend({
 	}
 })
 
-var CurrentWeatherCollection = Backbone.Collection.extend({
-	url: function() {
-		"https://api.forecast.io/forecast/a8a1d6dd27dd4b8c77724d9b4743bcd2/" + this.latLon
+var CurrentWeatherModel = Backbone.Model.extend({
+	url: function(){
+		return "https://api.forecast.io/forecast/a8a1d6dd27dd4b8c77724d9b4743bcd2/" + this.get("latLon")
 	},
 	
 	parse: function(responseData) {
@@ -51,19 +51,20 @@ var WeatherView = React.createClass({
 	render: function() {
 		return(
 				<div id="weatherWrap"> 
-					<Opener weatherData={this.props.weather}/>
+					<Opener weatherData={this.props.weather.attributes} />	
 				</div>
 			)
 	},
 })
 
 var Opener = React.createClass({
-	_getHourlyData: function(object) {
-		return (<HourlyInfo hourly={object} />)
+
+	_getHourlyData: function(hourlyObj) {
+		return (<HourlyInfo hourly={hourlyObj} />)
 	},
 
-	_getWeeklyData: function(object) {
-		return (<WeeklyInfo weekly={object} />)
+	_getWeeklyData: function(weeklyObj) {
+		return (<WeeklyInfo weekly={weeklyObj} />)
 	},
 
 	_getUserQuery: function(event) {
@@ -90,9 +91,6 @@ var Opener = React.createClass({
 })
 
 var DefaultInfo = React.createClass({
-	componentDidMount: function() {
-		console.log(this)
-	}, 
 
 	render: function() {
 		return(
@@ -110,15 +108,13 @@ var DefaultInfo = React.createClass({
 
 })
 
-var CurrentInfo = React.createClass({
-	componentDidMount: function() {
-		console.log(this)
-	}, 
+var CurrentInfo = React.createClass({ 
 
 	_getTime: function() {
 		var d = new Date(this.props.currently.time * 1000),
 			hours = d.getHours(),
 			minutes = d.getMinutes()
+		if (minutes < 10) minutes = "0" + minutes
 		if (hours === 0) {
 			return 12 + ":" + minutes + "AM"
 		} else if (hours > 12) {
@@ -149,15 +145,10 @@ var CurrentInfo = React.createClass({
 	}
 })
 
-var HourlyInfo = React.createClass({
-	componentDidMount: function() {
-		console.log(this)
-	}, 
+var HourlyInfo = React.createClass({ 
 	
 	_getTime: function(time) {
 		var d = new Date(this.props.hourly.time * 1000)
-		console.log(d)
-		console.log(d.getHours())
 		if (d.getHours() > 12) {
 			return (d.getHours() - 12) + "PM"
 		} else if (d.getHours() === 12) {
@@ -185,15 +176,10 @@ var HourlyInfo = React.createClass({
 })
 
 var WeeklyInfo = React.createClass({
-	componentDidMount: function() {
-		console.log(this)
-	}, 
 	
 	_getDay: function(time) {
 		var d = new Date(this.props.weekly.time * 1000)
-		console.log(d)
 		return d.toString().split(" ").slice(0,1).join()
-		console.log(d)
 	},
 
 	_getTemp: function(temperature) {
@@ -219,14 +205,8 @@ var WeeklyInfo = React.createClass({
 //============Router=========
 var WeatherRouter = Backbone.Router.extend({
 	routes: {
-		"*anyroute": "showDefault",
-		"weather/:query": "showCurrent"
-	},
-
-	topComponent: function(data) {
-		console.log('starting to render')
-		console.log(data)
-		React.render(<WeatherView weather={data} />,document.querySelector("#container"))
+		"weather/:query": "showCurrent",
+		"*anyroute": "showDefault"
 	},
 
 	// fetcher: function(query) {
@@ -243,28 +223,35 @@ var WeatherRouter = Backbone.Router.extend({
 	
 	showDefault: function() {
 		var self = this
-		console.log("getting current weather")
-		this.dwc.fetch({
+		console.log("getting the default")
+		this.dwm.fetch({
 			dataType: "jsonp",
 			processData: true
-		}).done(self.topComponent)
+		}).done(function(){
+			React.render(<WeatherView weather={self.dwm} />,document.querySelector("#container"))
+		})
+		console.log(this.dwm)
 	},
 
 	showCurrent: function(query) {
 		var self = this
-		self.cwc.set({latLon:query})
+		self.cwm.set({latLon:query})
+		console.log(this.cwm)
 		console.log("getting current weather")
 		//1 capture the query from the route (expectimng lat/long values)
 		console.log(query)
-		this.cwc.fetch({
+		this.cwm.fetch({
 			dataType: "jsonp",
 			processData: true
-		}).done(self.topComponent)
+		}).done(function(){
+			React.render(<WeatherView weather={self.cwm} />,document.querySelector("#container"))
+		})
+		console.log(this.cwm)
 	},
 
 	initialize: function() {
-		this.dwc = new DefaultWeatherCollection(),
-		this.cwc = new CurrentWeatherCollection(),
+		this.dwm = new DefaultWeatherModel()
+		this.cwm = new CurrentWeatherModel()
 		Backbone.history.start()
 	}
 
